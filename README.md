@@ -238,7 +238,7 @@ More information about dangling images/volumes can be found at this [link](https
 
 If you have problems, bugs, issues with or questions about this, please reach us in [Github issues page](https://github.com/ciandt-dev/docker-hub-solr/issues).
 
-__Needless to say__, please do a litle research before posting.
+__Needless to say__, please do a little research before posting.
 
 ### [*Contributing*](#contributing)
 
