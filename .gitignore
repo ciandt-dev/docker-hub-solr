@@ -1,6 +1,3 @@
-# ignore all files except documentation and gitignore
-*
-!.gitignore
-!LICENSE
-!MAINTAINERS.txt
-!README.md
+# ignore all configuration files except local
+conf/*
+!conf/solr.local.env

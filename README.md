@@ -1,229 +1,175 @@
-## CI&T Acquia Solr mimic Docker base image
+### CI&T Acquia Solr mimic Docker base image
 
-This is the source code of [CI&T Acquia Solr Docker image](https://hub.docker.com/r/ciandtsoftware/solr/) hosted at [Docker hub](https://hub.docker.com/).
+This Docker image intends to be containerized mimic solution of Acquia Solr environment.
 
-It contents the source code for building the publicly accessible Docker image and some scripts to easy maintain and update its code.
+The source code is available under GPLv3 at Bitbucket in this [link](https://bitbucket.org/ciandt_it/docker-hub-solr).
 
 Our intent is to have a Docker container that mimics Acquia Solr environment with the same version of softwares and OS.
 
 Utilizing Docker technologies that already provides an easy way of spinning up new environments and its dependecies, this image can speed-up developers which different backgrounds and equipments to have a fast local environment allowing them to easily integrate in automated tests and deployment pipelines.
 
-Keeping it short, this image contains a working set of Ubuntu and Apache Solr.
+Keeping it short, this image contains the same working set of Ubuntu and Apache Solr Acquia utilizes.
+
+### [*Quick Start*](#quickstart)
+
+__Download the image__
+
+```
+docker pull ciandtsoftware/solr:acquia-2016-11-08
+```
+
+__Run a container__
+
+```
+docker run \
+  --name myContainer \
+  --detach \
+  ciandtsoftware/solr:acquia-2016-11-08
+```
+
+__Check running containers__
+
+```
+docker ps --all
+```
 
 * * *
 
-## [*Quick Start*](#quickstart)
-
-__Clone the project code__
-
-```
-git clone https://bitbucket.org/ciandt_it/docker-hub-solr.git
-```
-
-__Checkout the latest tag__
-
-```
-git checkout acquia-2016-11-08
-```
-
-__Build__
-
-```
-make
-```
-* * *
-
-## [*Requirements*](#requirements)
-
-Before proceeding please check the required packages below:
-
- - docker engine => 1.12
- - make
- - grep
- - curl
-
-* * *
-
-## [Software Versions](#software-versions)
+### [Software Versions](#software-versions)
 
 These are the currently versions bundled in this image.
 
 Already installed
 
 * Ubuntu 12.04.5
-+ Solr 3.5.0
+* Solr 3.5.0
     * Drupal Search API 7.x-1.8
 * Dumb-init 1.2.0
 
 * * *
 
-## [Build process](#build-process)
+### [Running standalone](#running-standalone)
 
-There are some required environment variables that are already pre-defined in Dockerfile to specify software versions for the build step, if you need to modify them, please look for any line starting with __ENV__.
+If you just need the container there is a snippet that can help running in standalone mode.
 
-More information about ENV is available at this [link](https://docs.docker.com/engine/reference/builder/#/env).
+```
+# define variables
+DOCKER_CONTAINER_NAME="myContainer"
+DOCKER_IMAGE="solr:acquia-2016-11-08"
+
+# run your container
+docker run \
+  --name "${DOCKER_CONTAINER_NAME}" \
+  --detach \
+  "${DOCKER_IMAGE}"
+```
+
+After run, you can inquiry Docker service and get the IP address and port of your newly running container named __myContainer__ by using the following command:
+
+```
+docker inspect --format '{{ .NetworkSettings.IPAddress }} myContainer'
+```
+
+Let's suppose that the returned IP address was __172.17.0.2__.
+Since Solr standard port is __8983__, just open a browser and try to access:
+
+> http://172.17.0.2:8983
+
+Apache Solr landing page should be displayed perfectly.
 
 * * *
 
-## [.env](#env)
+### [Running in Docker-Compose](#running-docker-compose)
 
-Thinking in a multi-stage environment, a file name __.env__ is provided at repository root and it is used to define which set of ENV variables are going to load-up during Docker run.
+Since a project is not going to use solely this container, it may need a Docker-Compose file.
 
-Default value is:
+Just to exercise, follow an example of this running with __Apache/PHP__ and also both behind a __Nginx__ proxy.
 
-> __ENVIRONMENT="local"__
+Create a new folder and fill with these 3 files and respective folders;
 
-It is possible to change to any desired string value. This is just an ordinary alias to load one of configuration files that can exist in __conf__ folder.
+##### [__conf/acquia.local.env__](#acquia-env)
 
-Example, if you change it to:
+```
+## Nginx proxy configuration
+# https://hub.docker.com/r/jwilder/nginx-proxy/
+VIRTUAL_HOST=mySite.local
+```
 
-> ENVIRONMENT="__dev__"
+##### [__conf/solr.local.env__](#acquia-env)
 
-When you run the container it will load variables from:
+```
+## Nginx proxy configuration
+# https://hub.docker.com/r/jwilder/nginx-proxy/
+VIRTUAL_HOST=mySolr.local
+VIRTUAL_PORT=8983
+```
 
-> conf/solr.__dev__.env
+##### [__docker-compose.yml__](#docker-compose)
 
-It is an easy way to inject new variables when developing a new script.
+```
+solr:
+  image: ciandtsoftware/solr:acquia-2016-11-08
+  container_name: solr
+  env_file: ../conf/solr.local.env
+
+acquia:
+  build: ./acquia
+  container_name: acquia
+  env_file: ../conf/acquia.local.env
+  links:
+    - solr
+
+nginx:
+  image: jwilder/nginx-proxy:latest
+  container_name: nginx
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+  ports:
+    - "80:80"
+    - "443:443"
+```
+
+Then just spin-up your Docker-Compose with the command:
+
+```
+docker-compose up -d
+```
+
+Inspect Nginx container IP address:
+
+```
+docker inspect \
+        --format \
+        "{{.NetworkSettings.Networks.bridge.IPAddress }}" \
+        "nginx"
+```
+
+Use the IP address to update __hosts__ file. Let's suppose that was 172.17.0.2.
+
+Then, add the entries to __/etc/hosts__.
+
+> 172.17.0.2 acquia.local
+> 172.17.0.2 solr.local
+
+And now, try to access in the browser
+> http://solr.local/solr/admin
+
+Voilà!
+Your project now have Solr, Apache/PHP and Nginx up and running.
+\\o/
 
 * * *
 
-## [Run process](#run-process)
+### [Contributing](#contributing)
 
-As described in .env section, run will load environment variables from a file.
-This approach is better describe in official Docker docs in the [link](https://docs.docker.com/compose/env-file/).
-
-* * *
-
-## [Debug and Shell access](#debug-shell)
-
-Case there is a need of debug or inspect inside the container there are two options to help:
-
-> make debug
-
-and
-
-> make shell
-
-The first one runs the container and attaches __stderr__ and __stdout__ to current terminal and prints relevant information.
-
-Second one runs the container and connects to its shell (bash) with root access. So, you can inspect files, configurations and the whole container environment.
+If you want to contribute, suggest improvements and report issues, please go to our [Bitbucket repository](https://bitbucket.org/ipinatti_cit/docker-hub-solr).
 
 * * *
 
-## [Testing](#testing)
-
-After any modification we strongly recommend to run tests against the container to check if everything is running smoothly.
-This can be done with the command:
-
-> make tests
-
-These are simple tests at the moment, therefore, very usefull.
-
-* * *
-
-## [All steps](#all-steps)
-
-Now that you __already__ __read__ the previous steps, you are aware of each function. Having said that, the easisest way of wrapping up everything together is to just run:
-
-> make
-
-or
-
-> make all
-
-This command will __build__, __run__ and __test__ your recently created container.
-
-## [Cleaning up](#cleaning-up)
-
-Since Docker generates tons of layers that can fast outgrow your hard drive, after that you have finished any modification, we encourage to clean up your environment.
-
-There are two commands for this task:
-
-> make clean
-
-That stops the running container, removes it and deletes its Docker image.
-This particular one is very usefull when you are performing cjanges and you need to rebuild your container to check for modifications.
-In addition, you can combine with __make shell__ for instance, like in this example:
-
-> make clean && make shell
-
-And the second one is:
-
-> make clean-all
-
-Actually, this one calls __make clean__ and then removes Docker dangling images and volumes.
-More information about dangling can be found at this [link](https://docs.docker.com/engine/reference/commandline/images/).
-
-* * *
-
-## [How-to](#how-to)
-
-There is a Makefile in the root of the repository with all actions that can be performed.
-
-#### [Build](#how-to-build)
-
-```
-make build
-```
-
-#### [Run](#how-to-run)
-
-```
-make run
-```
-
-#### [Test](#how-to-test)
-
-```
-make test
-```
-
-#### [Debug](#how-to-debug)
-
-```
-make debug
-```
-
-#### [Shell access](#how-to-shell)
-
-```
-make shell
-```
-
-#### [Clean](#how-to-clean)
-
-```
-make clean
-```
-
-#### [Clean All](#how-to-clean-all)
-
-```
-make clean-all
-```
-
-#### [All - Build / Run / Test](#how-to-all)
-
-```
-make all
-```
-
-Or simply
-
-```
-make
-```
-
-* * *
-
-## [More](#more)
-
-Furthermore, there is an additional documentation at our Docker Hub page at https://hub.docker.com/r/ciandtsoftware/acquia/ .
-
-We strongly encourage reading it too!
-
-* * *
+Please feel free to drop a message in the comments section.
 
 Happy coding, enjoy!!
 
 "We develop people before we develop software" - Cesar Gon, CEO
+
+* * *
