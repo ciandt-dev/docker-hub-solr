@@ -1,5 +1,6 @@
 # ignore all files except documentation and gitignore
 *
+!CONTRIBUTORS.txt
 !.gitignore
 !LICENSE
 !MAINTAINERS.txt
