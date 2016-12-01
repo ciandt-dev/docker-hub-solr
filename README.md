@@ -34,15 +34,15 @@ __*Deprecated*__
     * Drupal Search API 7.x-1.8
   * Dumb-init 1.2.0
 
-### [*Quick Start*](#quickstart)
+## [Quick Start](#quickstart)
 
-__Download the image__
+__*Download the image*__
 
 ```
 docker pull ciandtsoftware/solr:acquia-latest
 ```
 
-__Run a container__
+__*Run a container*__
 
 ```
 docker run \
@@ -51,7 +51,7 @@ docker run \
   ciandtsoftware/solr:acquia-latest
 ```
 
-__Check running containers__
+__*Check running containers*__
 
 ```
 docker ps --all
@@ -66,7 +66,7 @@ If you just need the container there is a snippet that can help running in stand
 ```
 # define variables
 DOCKER_CONTAINER_NAME="myContainer"
-DOCKER_IMAGE="solr:acquia-latest"
+DOCKER_IMAGE="ciandtsoftware/solr:acquia-latest"
 
 # run your container
 docker run \
@@ -75,7 +75,7 @@ docker run \
   "${DOCKER_IMAGE}"
 ```
 
-After run, you can inquiry Docker service and get the IP address and port of your newly running container named __myContainer__ by using the following command:
+After run, you can inquiry Docker service and get the IP address of your newly running container named __myContainer__ by using the following command:
 
 ```
 docker inspect --format '{{ .NetworkSettings.IPAddress }} myContainer'
@@ -98,7 +98,7 @@ Just to exercise, follow an example of this running with __Apache/PHP__ and also
 
 Create a new folder and fill with these 3 files and respective folders;
 
-#### [__conf/php.local.env__](#php-env)
+#### [__*conf/php.local.env*__](#php-env)
 
 ```
 ## Nginx proxy configuration
@@ -106,7 +106,7 @@ Create a new folder and fill with these 3 files and respective folders;
 VIRTUAL_HOST=mySite.local
 ```
 
-#### [__conf/solr.local.env__](#solr-env)
+#### [__*conf/solr.local.env*__](#solr-env)
 
 ```
 ## Nginx proxy configuration
@@ -115,7 +115,7 @@ VIRTUAL_HOST=mySolr.local
 VIRTUAL_PORT=8983
 ```
 
-#### [__docker-compose.yml__](#docker-compose)
+#### [__*docker-compose.yml*__](#docker-compose)
 
 ```
 solr:
