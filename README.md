@@ -25,6 +25,7 @@ These are the currently software versions bundled in the image(s) by tag.
   * Solr 3.5.0
     * Drupal Search API 7.x-1.8
   * Dumb-init 1.2.0
+
 __*Deprecated*__
 
 * acquia-2016-11-08
