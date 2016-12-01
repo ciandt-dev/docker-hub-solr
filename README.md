@@ -10,7 +10,7 @@ At this moment we have the following version(s).
 
 ### [Acquia](#acquia)
 
-Our intent is to be a Docker container that mimics Memcached running on Acquia environment with the same version of softwares, packages, modules and its underlying operating system.
+Our intent is to be a Docker container that mimics Solr running on Acquia environment with the same version of softwares, packages, modules and its underlying operating system.
 
 Acquia publishes a table with its platform infrastructure information on the link: https://docs.acquia.com/cloud/arch/tech-platform
 
