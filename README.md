@@ -20,6 +20,13 @@ These images will have the following name pattern: __acquia-*YYYY-MM-DD*__
 
 These are the currently software versions bundled in the image(s) by tag.
 
+* acquia-latest __OR__ acquia-2016-11-30
+  * Ubuntu 12.04.5
+  * Solr 3.5.0
+    * Drupal Search API 7.x-1.8
+  * Dumb-init 1.2.0
+__*Deprecated*__
+
 * acquia-2016-11-08
   * Ubuntu 12.04.5
   * Solr 3.5.0
@@ -46,7 +53,7 @@ And also, before proceeding please check the __required__ packages below:
 __*Clone the desired project code version*__
 
 ```
-DESIRED_VERSION="acquia-2016-11-08"
+DESIRED_VERSION="acquia-latest"
 
 git clone \
   --branch "${DESIRED_VERSION}" \
@@ -254,7 +261,7 @@ First, in the master branch, is this README.MD. It explains how this little scri
 
 Second, in each image version there is an additional README.MD file that explains how to use that specific Docker image version itself. __*Latest version*__ is always the one seen on [Docker Hub page](https://hub.docker.com/r/ciandtsoftware/solr).
 
-We strongly encourage reading it too!
+We strongly encourage reading both!
 
 * * *
 
