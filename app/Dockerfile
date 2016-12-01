@@ -2,7 +2,6 @@ FROM ubuntu:12.04.5
 
 # define Docker image label information
 LABEL com.ciandt.vendor="CI&T Software SA" \
-      com.ciandt.release-date="2016-11-08" \
       com.ciandt.maintainers.1="Ivan Pinatti - @ivan_pinatti" \
       com.ciandt.maintainers.2="Thomas Bryan - @thobryan"
 
