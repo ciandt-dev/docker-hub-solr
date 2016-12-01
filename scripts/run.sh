@@ -54,7 +54,7 @@ if [ $? -eq 0 ]; then
   If you prefer to use URL instead, please add it to your hosts file
   Just copy and paste the command below in your terminal or add it manually later
 
-  sudo bash -c 'echo ${DOCKER_CONTAINER_IP} solr.local >> /etc/hosts'
+  sudo bash -c 'echo "${DOCKER_CONTAINER_IP} solr.local" >> /etc/hosts'
 
   THEN, will be able to access at:
   http://solr.local:${DOCKER_CONTAINER_PORT}
