@@ -39,7 +39,7 @@ __*Deprecated*__
 __*Download the image*__
 
 ```
-docker pull ciandtsoftware/solr:acquia-latest
+docker pull ciandt/solr:acquia-latest
 ```
 
 __*Run a container*__
@@ -48,7 +48,7 @@ __*Run a container*__
 docker run \
   --name myContainer \
   --detach \
-  ciandtsoftware/solr:acquia-latest
+  ciandt/solr:acquia-latest
 ```
 
 __*Check running containers*__
@@ -66,7 +66,7 @@ If you just need the container there is a snippet that can help running in stand
 ```
 # define variables
 DOCKER_CONTAINER_NAME="myContainer"
-DOCKER_IMAGE="ciandtsoftware/solr:acquia-latest"
+DOCKER_IMAGE="ciandt/solr:acquia-latest"
 
 # run your container
 docker run \
@@ -119,12 +119,12 @@ VIRTUAL_PORT=8983
 
 ```
 solr:
-  image: ciandtsoftware/solr:acquia-latest
+  image: ciandt/solr:acquia-latest
   container_name: solr
   env_file: ../conf/solr.local.env
 
 php:
-  image: ciandtsoftware/php:acquia-latest
+  image: ciandt/php:acquia-latest
   container_name: php
   env_file: ../conf/php.local.env
   links:
@@ -191,7 +191,7 @@ There are __two parts__ of the documentation.
 
 First, in the master branch, is this README.MD. It explains how this little scripts framework work and it is published on [Github page](https://github.com/ciandt-dev/docker-hub-solr).
 
-Second, in each image version there is an additional README.MD file that explains how to use that specific Docker image version itself. __*Latest version*__ is always the one seen on [Docker Hub page](https://hub.docker.com/r/ciandtsoftware/solr).
+Second, in each image version there is an additional README.MD file that explains how to use that specific Docker image version itself. __*Latest version*__ is always the one seen on [Docker Hub page](https://hub.docker.com/r/ciandt/solr).
 
 We strongly encourage reading both!
 
