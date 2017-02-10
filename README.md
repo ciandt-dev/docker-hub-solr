@@ -1,242 +1,145 @@
-# CI&T Solr Docker image(s)
+## CI&T Solr Docker image(s)
 
-This is the source code of [CI&T Solr Docker image(s)](https://hub.docker.com/r/ciandt/solr/) hosted at [Docker hub](https://hub.docker.com/).
+These Docker image(s) intends to be a containerized Solr solution for multiple purposes.
 
-It contents the source code for building the publicly accessible Docker image(s) and some scripts to easy maintain and update its code.
+The source code is available under GPLv3 at Github in this [link]((https://github.com/ciandt-dev/docker-hub-solr).
 
 By utilizing Docker technologies, that already provides an easy way of spinning up new environments along with its dependecies. This image can speed up developers which different backgrounds and equipments to create quickly a new local environment allowing them to easily integrate in automated tests and deployment pipelines.
 
-At this moment we have the following version(s)
+## [Quick Start](#quickstart)
 
-## [Acquia](#acquia)
-
-Our intent is to be a Docker container that mimics Solr running on Acquia environment with the same version of softwares, packages, modules and its underlying operating system.
-
-Acquia publishes a table with its platform infrastructure information on the link: https://docs.acquia.com/cloud/arch/tech-platform
-
-These images will have the following name pattern: __acquia-*YYYY-MM-DD*__
-
-#### [*Bundled software versions*](#software-versions)
-
-These are the currently software versions bundled in the image(s) by tag.
-
-* acquia-latest __OR__ acquia-2016-11-30
-  * Ubuntu 12.04.5
-  * Solr 3.5.0
-    * Drupal Search API 7.x-1.8
-  * Dumb-init 1.2.0
-
-__*Deprecated*__
-
-* acquia-2016-11-08
-  * Ubuntu 12.04.5
-  * Solr 3.5.0
-    * Drupal Search API 7.x-1.8
-  * Dumb-init 1.2.0
-
-* * *
-
-# [Requirements](#requirements)
-
-Since Docker at the moment was designed to run natively just on __Linux__, we do consider this as __premisse__.
-
-And also, before proceeding please check the __required__ packages below:
-
- - docker engine => 1.12
- - make
- - grep
- - curl
-
-* * *
-
-# [Quick Start](#quickstart)
-
-__*Clone the desired project code version*__
+__*Download the image*__
 
 ```
-DESIRED_VERSION="acquia-latest"
-
-git clone \
-  --branch "${DESIRED_VERSION}" \
-  git@github.com:ciandt-dev/docker-hub-solr.git
+docker pull ciandt/solr:4.5.0
 ```
 
-__*Build, run and test*__
+__*Run a container*__
 
 ```
-make
+docker run \
+  --name myContainer \
+  --detach \
+  ciandt/solr:4.5.0
+```
+
+__*Check running containers*__
+
+```
+docker ps --all
 ```
 
 * * *
 
-## [How-to](#how-to)
+## [Running standalone](#running-standalone)
 
-It is possible to perform any of the actions described below:
-
-### [*Build*](#how-to-build)
+If you just need the container there is a snippet that can help running in standalone mode.
 
 ```
-make build
+# define variables
+DOCKER_CONTAINER_NAME="myContainer"
+DOCKER_IMAGE="ciandt/solr:4.5.0"
+
+# run your container
+docker run \
+  --name "${DOCKER_CONTAINER_NAME}" \
+  --detach \
+  "${DOCKER_IMAGE}"
 ```
 
-### [*Run*](#how-to-run)
+After run, you can inquiry Docker service and get the IP address of your newly running container named __myContainer__ by using the following command:
 
 ```
-make run
+docker inspect --format '{{ .NetworkSettings.IPAddress }} myContainer'
 ```
 
-### [*Test*](#how-to-test)
+Let's suppose that the returned IP address was __172.17.0.2__.
+Since Solr standard port is __8983__, just open a browser and try to access:
 
-```
-make test
-```
+> http://172.17.0.2:8983
 
-### [*Debug*](#how-to-debug)
-
-```
-make debug
-```
-
-### [*Shell access*](#how-to-shell)
-
-```
-make shell
-```
-
-### [*Clean*](#how-to-clean)
-
-```
-make clean
-```
-
-### [*Clean All*](#how-to-clean-all)
-
-```
-make clean-all
-```
-
-### [*All - Build / Run / Test*](#how-to-all)
-
-```
-make all
-```
-
-<sub>*or simply*</sub>
-
-```
-make
-```
+Apache Solr landing page should be displayed perfectly.
 
 * * *
 
-## [Deep diving](#deep-dive)
+## [Running in Docker-Compose](#running-docker-compose)
 
-### [*.env file*](#env)
+Since a project is not going to use solely this container, it may need a Docker-Compose file.
 
-As this little framework was designed to be re-utilized on other Docker images it contains a __.env__ file provided at repository root. This file has some self-described variables and they are used by all scripts to perform its own tasks, just inspect the .env file to check them out.
+Just to exercise, follow an example of this running with __Apache/PHP__ and also both behind a __Nginx__ proxy.
 
-The only one that is important to mention is:
+Create a new folder and fill with these 3 files and respective folders;
 
-> __ENVIRONMENT__
-
-Environment default value is always __local__. It is possible to change to any desired string value, this is just an ordinary alias to load one of the configuration files that can exist in __conf__ folder.
-
-Example, if you change it to:
-
-> ENVIRONMENT="__dev__"
-
-When you __run__ (*not build*) the container will load variables from:
-
-> conf/*$APP_NAME*.__dev__.env
-
-This is an easy way to inject variables when developing a new script and testing multi-environment solution.
-
-* * *
-
-### [*Build process*](#build-process)
-
-This process will execute instructions in Dockerfile that is inside __app__ folder.
-Dockerfile will have several environment variables for the __build__ step, when you need to modify them please look for any line starting with __ENV__. More information about Dockerfile ENV (environment variables) is available at this [link](https://docs.docker.com/engine/reference/builder/#/env).
-
-* * *
-
-### [*Run process*](#run-process)
-
-As described in <a name="env">.env file</a> section, run will load environment variables from an existing file inside __conf folder__.
-This approach is better describe in official Docker docs in the [link](https://docs.docker.com/compose/env-file/).
-
-* * *
-
-### [*Debug and Shell access*](#debug-shell)
-
-Wheter there is a need of __debuging__ or __inspecting__ inside the container there are two options to help:
+#### [__*conf/php.local.env*__](#php-env)
 
 ```
-make debug
+## Nginx proxy configuration
+# https://hub.docker.com/r/jwilder/nginx-proxy/
+VIRTUAL_HOST=mySite.local
 ```
 
-and
+#### [__*conf/solr.local.env*__](#solr-env)
 
 ```
-make shell
+## Nginx proxy configuration
+# https://hub.docker.com/r/jwilder/nginx-proxy/
+VIRTUAL_HOST=mySolr.local
+VIRTUAL_PORT=8983
 ```
 
-The first one runs the container and attaches __*stderr*__ and __*stdout*__ to current terminal and prints relevant information.
-
-Second one runs the container and connects to its shell (bash). So, you can inspect files, configurations and the whole container environment.
-
-* * *
-
-### [*Testing*](#testing)
-
-After any modification we strongly recommend to run tests against the container to check if everything is running smoothly.
-
-This can be done with the command:
+#### [__*docker-compose.yml*__](#docker-compose)
 
 ```
-make test
+solr:
+  image: ciandt/solr:4.5.0
+  container_name: solr
+  env_file: ../conf/solr.local.env
+
+php:
+  image: ciandt/php:acquia-latest
+  container_name: php
+  env_file: ../conf/php.local.env
+  links:
+    - solr
+
+nginx:
+  image: jwilder/nginx-proxy:latest
+  container_name: nginx
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+  ports:
+    - "80:80"
+    - "443:443"
 ```
 
-These are simple tests at the moment, therefore, very usefull.
-
-* * *
-
-### [*All steps*](#all-steps)
-
-Now that you __already__ __read__ the previous steps, you are aware of each function. Knowing that, the easisest way of wrapping up everything together is to just run:
+Then just spin-up your Docker-Compose with the command:
 
 ```
-make
+docker-compose up -d
 ```
 
-This command will __build__, __run__ and __test__ your recently created container.
-
-### [*Cleaning up*](#cleaning-up)
-
-Since Docker generates tons of layers that can fast outgrow your hard drive. After that you have finished any modification we encourage to clean up your environment.
-
-There are two commands for this task:
+Inspect Nginx container IP address:
 
 ```
-make clean
+docker inspect \
+        --format \
+        "{{.NetworkSettings.Networks.bridge.IPAddress }}" \
+        "nginx"
 ```
 
-It stops the running container, removes it and deletes its Docker image.
-This particular one is very usefull when you are performing changes and you need to rebuild your container many times to check for modifications.
-In addition, you can combine with __make shell__ for instance, like in this example:
+Use the IP address to update __hosts__ file. Let's suppose that was 172.17.0.2.
 
-```
-make clean && make shell
-```
+Then, add the entries to __/etc/hosts__.
 
-And the second one is:
+> 172.17.0.2 php.local
+> 172.17.0.2 solr.local
 
-```
-make clean-all
-```
+And now, try to access in the browser
+> http://solr.local/solr/admin
 
-Actually, this one calls __make clean__ first, and then removes Docker __dangling images and volumes__.
-More information about dangling images/volumes can be found at this [link](https://docs.docker.com/engine/reference/commandline/images/).
+Voilà!
+Your project now have Solr, Apache/PHP and Nginx up and running.
+\\o/
 
 * * *
 
@@ -265,6 +168,8 @@ Second, in each image version there is an additional README.MD file that explain
 We strongly encourage reading both!
 
 * * *
+
+Please feel free to drop a message in the comments section.
 
 Happy coding, enjoy!!
 
